@@ -25,7 +25,7 @@ class AuthController extends BaseController
                 $user = Auth::user();
                 $response = [
                     'user' => $user,
-                    // 'token' => $user->createToken('personal token'),
+                    'token' => $user->createToken('personal token')->plainTextToken,
                 ];
                 return $this->sendResponse($response, '200' , 'Authenticated.');
             } else {

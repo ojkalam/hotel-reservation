@@ -18,7 +18,7 @@ Route::delete('hotels/{id}', [HotelController::class, 'destroy'])->name('hotel.d
 //without force json middleware
 Route::post('amenities', [AmenityController::class, 'store'])->name('amenities.store');
 //with force json middleware
-Route::group(['middleware' => 'force.JSON'], function () {
+Route::group(['middleware' => ['force.JSON', 'auth:sanctum']], function () {
     Route::get('amenities', [AmenityController::class, 'list'])->name('amenities.list');
     Route::get('amenities/{id}', [AmenityController::class, 'show'])->name('amenities.show');
     Route::post('amenities/{id}', [AmenityController::class, 'update'])->name('amenities.update');
