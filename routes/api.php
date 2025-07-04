@@ -1,8 +1,13 @@
 <?php
 
 use App\Http\Controllers\Api\AmenityController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\HotelController;
 use Illuminate\Support\Facades\Route;
+
+//public route
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::get('hotels', [HotelController::class, 'list'])->name('hotel.list');
 Route::get('hotels/{id}', [HotelController::class, 'show'])->name('hotel.show');
