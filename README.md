@@ -7,7 +7,6 @@ This is a REST API built using Laravel for Hotel Reservation Mobile App.
 -   PHP 8.1+
 -   Composer
 -   MySQL/PostgreSQL
--   Laravel 10+
 
 ## Installation & Setup
 
