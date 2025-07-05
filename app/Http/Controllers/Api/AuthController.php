@@ -23,6 +23,16 @@ class AuthController extends BaseController
         try {
             if (Auth::attempt($data)) {
                 $user = Auth::user();
+                // $best_response = [
+                //     'id' => auth()->user()->id,
+                //     'user_name' => auth()->user()->user_name,
+                //     'avatar' => auth()->user()->avatar,
+                //     'access_token' => $tokenResult->accessToken,
+                //     'token_type' => 'Bearer',
+                //     'expires_at' => Carbon::parse(
+                //         $tokenResult->token->expires_at
+                //     )->toDateTimeString()
+                // ]
                 $response = [
                     'user' => $user,
                     'token' => $user->createToken('personal token')->plainTextToken,
