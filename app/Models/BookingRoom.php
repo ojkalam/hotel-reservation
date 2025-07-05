@@ -30,7 +30,11 @@ use App\Models\Room;
 class BookingRoom extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    protected $fillable = [
+        'booking_id',
+        'room_id',
+        'price',
+    ];
 
     public function booking()
     {

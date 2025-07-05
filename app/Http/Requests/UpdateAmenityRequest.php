@@ -24,8 +24,8 @@ class UpdateAmenityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|max:10',
-            'icon' => 'required',
+            'name' => 'required|string|max:255',
+            'icon' => 'nullable|string|max:255',
         ];
     }
 
@@ -33,7 +33,6 @@ class UpdateAmenityRequest extends FormRequest
     {
         return [
             'name.required' => 'Amenity field should be filled up!!!',
-            'name.max' => 'Should not greater than 10',
         ];
     }
 

@@ -44,7 +44,16 @@ use App\Models\Payment;
 class Booking extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'guest_name',
+        'guest_phone',
+        'booking_type',
+        'check_in_date',
+        'check_out_date',
+        'guest_count',
+        'status',
+    ];
     
     public function user()
     {

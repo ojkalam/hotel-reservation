@@ -42,7 +42,15 @@ use App\Models\Room;
 class Hotel extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'description',
+        'address',
+        'city',
+        'country',
+        'zipcode',
+        'rating',
+    ];
     public function roomTypes()
     {
         return $this->hasMany(RoomType::class);

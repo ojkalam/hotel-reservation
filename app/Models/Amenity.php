@@ -29,7 +29,10 @@ use App\Models\Room;
 class Amenity extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'icon',
+    ];
 
     public function rooms()
     {

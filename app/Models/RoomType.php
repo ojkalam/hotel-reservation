@@ -36,7 +36,13 @@ use App\Models\Room;
 class RoomType extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    protected $fillable = [
+        'hotel_id',
+        'type_name',
+        'description',
+        'max_occupancy',
+        'price_per_night',
+    ];
 
     public function hotel()
     {

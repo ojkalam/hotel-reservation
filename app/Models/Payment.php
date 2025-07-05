@@ -33,7 +33,13 @@ use App\Models\Booking;
 class Payment extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    protected $fillable = [
+        'booking_id',
+        'payment_method',
+        'amount',
+        'payment_status',
+        'payment_date',
+    ];
 
     public function booking()
     {

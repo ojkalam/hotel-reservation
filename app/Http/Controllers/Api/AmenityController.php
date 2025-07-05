@@ -6,57 +6,82 @@ use App\Http\Controllers\Api\BaseController;
 use App\Http\Requests\StoreAmenityRequest;
 use App\Http\Requests\UpdateAmenityRequest;
 use App\Models\Amenity;
+use Illuminate\Http\JsonResponse;
 
 class AmenityController extends BaseController
 {
-    public function list() {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function list(): JsonResponse
+    {
         try {
             $amenities = Amenity::all();
-            return $this->sendResponse($amenities, 200);
+            return $this->sendResponse($amenities, 200, 'Amenities retrieved successfully.');
         } catch (\Exception $e) {
-            return $this->sendErrorResponse($e->getMessage());
+            return $this->sendErrorResponse($e->getMessage(), 500, 'An error occurred while retrieving amenities.');
         }
     }
-    public function show($id) {
-        $amenity = Amenity::find($id);
-        if (!$amenity) {
-            return $this->sendErrorResponse('Amenity Not found.', 404);
-        }else{
-            return $this->sendResponse($amenity,200);
-        }
-    }
-    public function store(StoreAmenityRequest $request) {
-        try {
-            $amenity = Amenity::create($request->all());
-            return $this->sendResponse($amenity, 201, 'Amenity successfully created.');
-        } catch (\Exception $e) {
-            return $this->sendErrorResponse($e->getMessage());
-        }
-    }
-    public function update(UpdateAmenityRequest $request, $id) {
-        try {
-            $amenity = Amenity::find($id);
-            if (!$amenity) {
-                return $this->sendErrorResponse('Amenity Not found.', 404);
-            }else{
-                $data = $request->all();
-                $amenity->name = $data['name'];
-                $amenity->icon = $data['icon'];
-                $amenity->save();
-                return $this->sendResponse($amenity, 200, 'Amenity successfully updated.');
-            }
-        } catch (\Exception $e) {
-            return $this->sendErrorResponse($e->getMessage());
-        }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Amenity  $amenity
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(Amenity $amenity): JsonResponse
+    {
+        return $this->sendResponse($amenity, 200, 'Amenity retrieved successfully.');
     }
-    public function destroy($id) {
-        $amenity = Amenity::find($id);
-        if (!$amenity) {
-            return $this->sendErrorResponse('Amenity not found.', 404);
-        } else {
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\StoreAmenityRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(StoreAmenityRequest $request): JsonResponse
+    {
+        try {
+            $amenity = Amenity::create($request->validated());
+            return $this->sendResponse($amenity, 201, 'Amenity created successfully.');
+        } catch (\Exception $e) {
+            return $this->sendErrorResponse($e->getMessage(), 500, 'An error occurred while creating the amenity.');
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateAmenityRequest  $request
+     * @param  \App\Models\Amenity  $amenity
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(UpdateAmenityRequest $request, Amenity $amenity): JsonResponse
+    {
+        try {
+            $amenity->update($request->validated());
+            return $this->sendResponse($amenity, 200, 'Amenity updated successfully.');
+        } catch (\Exception $e) {
+            return $this->sendErrorResponse($e->getMessage(), 500, 'An error occurred while updating the amenity.');
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Amenity  $amenity
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Amenity $amenity): JsonResponse
+    {
+        try {
             $amenity->delete();
-            return $this->sendResponse('Amenity Deleted Successfully.', 200); //use 204 only when there is nothing to return on body.
+            return $this->sendResponse(null, 204, 'Amenity deleted successfully.');
+        } catch (\Exception $e) {
+            return $this->sendErrorResponse($e->getMessage(), 500, 'An error occurred while deleting the amenity.');
         }
     }
 }
