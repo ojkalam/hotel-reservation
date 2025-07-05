@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AmenityController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\HotelController;
 use App\Http\Controllers\Api\RoomTypeController;
+use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -32,4 +33,11 @@ Route::group(['middleware' => ['force.JSON', 'auth:sanctum']], function () {
     Route::post('room-types', [RoomTypeController::class, 'store'])->name('room-types.store');
     Route::put('room-types/{roomType}', [RoomTypeController::class, 'update'])->name('room-types.update');
     Route::delete('room-types/{roomType}', [RoomTypeController::class, 'destroy'])->name('room-types.destroy');
+
+    // Review routes
+    Route::get('reviews', [ReviewController::class, 'list'])->name('reviews.list');
+    Route::get('reviews/{review}', [ReviewController::class, 'show'])->name('reviews.show');
+    Route::post('reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put('reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
