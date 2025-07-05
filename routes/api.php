@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AmenityController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\HotelController;
+use App\Http\Controllers\Api\RoomTypeController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -24,4 +25,11 @@ Route::group(['middleware' => ['force.JSON', 'auth:sanctum']], function () {
     Route::post('amenities', [AmenityController::class, 'store'])->name('amenities.store');
     Route::put('amenities/{amenity}', [AmenityController::class, 'update'])->name('amenities.update');
     Route::delete('amenities/{amenity}', [AmenityController::class, 'destroy'])->name('amenities.destroy');
+
+    // Room Type routes
+    Route::get('room-types', [RoomTypeController::class, 'list'])->name('room-types.list');
+    Route::get('room-types/{roomType}', [RoomTypeController::class, 'show'])->name('room-types.show');
+    Route::post('room-types', [RoomTypeController::class, 'store'])->name('room-types.store');
+    Route::put('room-types/{roomType}', [RoomTypeController::class, 'update'])->name('room-types.update');
+    Route::delete('room-types/{roomType}', [RoomTypeController::class, 'destroy'])->name('room-types.destroy');
 });

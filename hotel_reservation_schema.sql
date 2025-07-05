@@ -1,4 +1,4 @@
--- Hotel Reservation System Database Schema
+-- Hotel Reservation System Database Schema created by Claude
 -- Generated on 2025-07-01 10:47:33
 
 CREATE TABLE users (

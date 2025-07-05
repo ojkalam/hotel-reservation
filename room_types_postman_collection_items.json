@@ -1,0 +1,195 @@
+{
+    "name": "Room Types",
+    "item": [
+        {
+            "name": "Room Type Get All",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{auth_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{hotel_reservation_base_url}}/room-types",
+                    "host": [
+                        "{{hotel_reservation_base_url}}"
+                    ],
+                    "path": [
+                        "room-types"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Room Type Get One",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{auth_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{hotel_reservation_base_url}}/room-types/{{room_type_id}}",
+                    "host": [
+                        "{{hotel_reservation_base_url}}"
+                    ],
+                    "path": [
+                        "room-types",
+                        "{{room_type_id}}"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Room Type Create",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{auth_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"hotel_id\": 1,\n    \"type_name\": \"Standard Double\",\n    \"description\": \"Comfortable room with two double beds.\",\n    \"max_occupancy\": 4,\n    \"price_per_night\": 120.00\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{hotel_reservation_base_url}}/room-types",
+                    "host": [
+                        "{{hotel_reservation_base_url}}"
+                    ],
+                    "path": [
+                        "room-types"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Room Type Update",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{auth_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"type_name\": \"Updated Deluxe King\",\n    \"description\": \"Newly renovated spacious room with king-size bed.\",\n    \"price_per_night\": 160.00\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{hotel_reservation_base_url}}/room-types/{{room_type_id}}",
+                    "host": [
+                        "{{hotel_reservation_base_url}}"
+                    ],
+                    "path": [
+                        "room-types",
+                        "{{room_type_id}}"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Room Type Delete",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{auth_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "{{hotel_reservation_base_url}}/room-types/{{room_type_id}}",
+                    "host": [
+                        "{{hotel_reservation_base_url}}"
+                    ],
+                    "path": [
+                        "room-types",
+                        "{{room_type_id}}"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ]
+}
