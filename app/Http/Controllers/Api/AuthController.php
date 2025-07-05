@@ -10,59 +10,75 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends BaseController
 {
-    public function login(Request $request)
+    /**
+     * Register a new user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
     {
-        $data = $request->all();
-        $validator = Validator::make($data, [
-            'email' => 'required',
-            'password' => 'required',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'phone' => 'required|string|max:20',
         ]);
+
         if ($validator->fails()) {
-            return $this->sendErrorResponse($validator->errors(), 422);
+            return $this->sendErrorResponse($validator->errors(), 422, 'Validation Error.');
         }
+
         try {
-            if (Auth::attempt($data)) {
-                $user = Auth::user();
-                // $best_response = [
-                //     'id' => auth()->user()->id,
-                //     'user_name' => auth()->user()->user_name,
-                //     'avatar' => auth()->user()->avatar,
-                //     'access_token' => $tokenResult->accessToken,
-                //     'token_type' => 'Bearer',
-                //     'expires_at' => Carbon::parse(
-                //         $tokenResult->token->expires_at
-                //     )->toDateTimeString()
-                // ]
-                $response = [
-                    'user' => $user,
-                    'token' => $user->createToken('personal token')->plainTextToken,
-                ];
-                return $this->sendResponse($response, '200' , 'Authenticated.');
-            } else {
-                return $this->sendErrorResponse('Credentials Does not matched', 401);
-            }
-            // return $this->sendResponse($auth_user,201, 'User created successfully.');
+            // Create user. The 'hashed' cast in the User model handles hashing automatically.
+            $user = User::create($request->all());
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            $response = [
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user,
+            ];
+
+            return $this->sendResponse($response, 201, 'User registered successfully.');
+
         } catch (\Exception $e) {
-            return $this->sendErrorResponse($e->getMessage());
+            return $this->sendErrorResponse($e->getMessage(), 500, 'An error occurred during registration.');
         }
     }
 
-    public function register(Request $request)
+    /**
+     * Authenticate an existing user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function login(Request $request)
     {
-        $data = $request->all();
-        $validator = Validator::make($data, [
-            'email' => 'required|unique:users,email',
-            'password' => 'required',
-            'phone' => 'required',
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'password' => 'required|string',
         ]);
+
         if ($validator->fails()) {
-            return $this->sendResponse($validator->errors(), 422, 'Validation Error.');
+            return $this->sendErrorResponse($validator->errors(), 422, 'Validation Error.');
         }
-        try {
-            $user = User::create($data);
-            return $this->sendResponse($user, 201, 'User created successfully.');
-        } catch (\Exception $e) {
-            return $this->sendErrorResponse($e->getMessage());
+
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return $this->sendErrorResponse('Invalid login details', 401);
         }
+
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $response = [
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ];
+
+        return $this->sendResponse($response, 200, 'Login successful.');
     }
 }
