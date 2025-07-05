@@ -10,8 +10,11 @@ use App\Models\Booking;
 //while using sanctum authentication for apis
 // use Laravel\Sanctum\HasApiTokens;
 //while using passport authentication for apis
-use Laravel\Passport\Contracts\OAuthenticatable;
-use Laravel\Passport\HasApiTokens;
+// use Laravel\Passport\Contracts\OAuthenticatable;
+// use Laravel\Passport\HasApiTokens;
+//JWT token authentication
+use Tymon\JWTAuth\Contracts\JWTSubject;
+
 /**
  *
  *
@@ -43,38 +46,52 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class User extends Authenticatable implements OAuthenticatable //while using passport authentication otherwise not needed
+class User extends Authenticatable implements JWTSubject //while using passport authentication otherwise not needed
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable; //, HasApiTokens; //use for sanctum and passport but not for jwt
 
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'phone',
-    ];
+    protected $fillable = ['name', 'email', 'password', 'phone'];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
+
+    // Rest omitted for brevity
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
     protected function casts(): array
     {
         return [

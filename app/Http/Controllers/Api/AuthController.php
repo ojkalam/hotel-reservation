@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use JWTAuth;
 
 class AuthController extends BaseController
 {
@@ -43,7 +44,6 @@ class AuthController extends BaseController
             ];
 
             return $this->sendResponse($response, 201, 'User registered successfully.');
-
         } catch (\Exception $e) {
             return $this->sendErrorResponse($e->getMessage(), 500, 'An error occurred during registration.');
         }
@@ -66,23 +66,47 @@ class AuthController extends BaseController
             return $this->sendErrorResponse($validator->errors(), 422, 'Validation Error.');
         }
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $credentials = request(['email', 'password']);
+
+        //for jwt authentication
+        // if (!JWTAuth::attempt($request->only('email', 'password')))  if you want to use this auth() helper method then you have to default guard api or call auth('api')->attempt();
+        $token = auth('api')->attempt($request->only('email', 'password'));
+        if (!$token) {
             return $this->sendErrorResponse('Invalid login details', 401);
         }
-
+        $expires_in = auth('api')->factory()->getTTL() * 60; //only for JWT authentication
+        //for sanctum or passport
+        // if (!Auth::attempt($request->only('email', 'password'))) {
+        //     return $this->sendErrorResponse('Invalid login details', 401);
+        // }
         $user = User::where('email', $request->email)->firstOrFail();
-
         // $token = $user->createToken('auth_token')->plainTextToken; //use it for sanctum token
-        $access_token_result = $user->createToken('auth_token'); //use it for passport token (personal client access token)
-        $token = $access_token_result->accessToken; //use it for passport token
-        $expires_in = Carbon::now()->addSeconds($access_token_result->expires_in); //use it for passport token
+        // $access_token_result = $user->createToken('auth_token'); //use it for passport token (personal client access token)
+        // $token = $access_token_result->accessToken; //use it for passport token
+        // $expires_in = Carbon::now()->addSeconds($access_token_result->expires_in); //use it for passport token
         $response = [
             'access_token' => $token,
-            'expires_in' => $expires_in, //only when using passport authentication
+            'expires_in' => $expires_in, //only when using passport authentication and for JWT
             'token_type' => 'Bearer',
             'user' => $user,
         ];
 
         return $this->sendResponse($response, 200, 'Login successful.');
     }
+
+    // public function logout()
+    // {
+    //     auth()->logout();
+
+    //     return response()->json(['message' => 'Successfully logged out']);
+    // }
+    // /**
+    //  * Refresh a token.
+    //  *
+    //  * @return \Illuminate\Http\JsonResponse
+    //  */
+    // public function refresh()
+    // {
+    //     return auth('api')->refresh();
+    // }
 }
