@@ -41,3 +41,14 @@ Route::group(['middleware' => ['force.JSON', 'auth:sanctum']], function () {
     Route::put('reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
+
+
+// Protected routes using basic auth
+Route::group(['middleware' => ['force.JSON', 'auth.basic']], function () {
+    // Review routes
+    Route::get('reviews', [ReviewController::class, 'list'])->name('reviews.list');
+    Route::get('reviews/{review}', [ReviewController::class, 'show'])->name('reviews.show');
+    Route::post('reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put('reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+});
