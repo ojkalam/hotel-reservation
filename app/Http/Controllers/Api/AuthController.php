@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use JWTAuth;
 
 class AuthController extends BaseController
 {
@@ -25,28 +24,98 @@ class AuthController extends BaseController
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'phone' => 'required|string|max:20',
+            'auth_type' => 'required|string|in:passport,sanctum,jwt',
         ]);
-
         if ($validator->fails()) {
             return $this->sendErrorResponse($validator->errors(), 422, 'Validation Error.');
         }
 
+        $authType = $request->input('auth_type');
+
         try {
-            // Create user. The 'hashed' cast in the User model handles hashing automatically.
-            $user = User::create($request->all());
+            $user = User::create($validator->validated());
 
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            $response = [
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user,
-            ];
-
-            return $this->sendResponse($response, 201, 'User registered successfully.');
+            switch ($authType) {
+                case 'passport':
+                    return $this->registerWithPassport($user);
+                case 'sanctum':
+                    return $this->registerWithSanctum($user);
+                case 'jwt':
+                    return $this->registerWithJwt($user);
+                default:
+                    return $this->sendErrorResponse('Invalid authentication type.', 400);
+            }
         } catch (\Exception $e) {
             return $this->sendErrorResponse($e->getMessage(), 500, 'An error occurred during registration.');
         }
+    }
+
+    /**
+     * Register user with Passport.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function registerWithPassport(User $user)
+    {
+        $tokenResult = $user->createToken('auth_token');
+        $token = $tokenResult->accessToken;
+        $expires_in = Carbon::now()->addSeconds($tokenResult->token->expires_at->diffInSeconds(Carbon::now()));
+
+        $response = [
+            'access_token' => $token,
+            'expires_in' => $expires_in,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ];
+
+        return $this->sendResponse($response, 201, 'User registered successfully with Passport.');
+    }
+
+    /**
+     * Register user with Sanctum.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function registerWithSanctum(User $user)
+    {
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $response = [
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ];
+
+        return $this->sendResponse($response, 201, 'User registered successfully with Sanctum.');
+    }
+
+    /**
+     * Register user with JWT.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function registerWithJwt(User $user)
+    {
+        // For JWT, after user creation, you might want to immediately log them in
+        // and return a JWT token. This assumes the user is already authenticated
+        // or you're using a different flow for JWT registration.
+        // For simplicity, we'll just return a success message for now.
+        // If you need to generate a JWT token here, you'd typically use JWTAuth::fromUser($user);
+
+        $token = auth('api')->login($user);
+        $expires_in = auth('api')->factory()->getTTL() * 60;
+
+        $response = [
+            'access_token' => $token,
+            'expires_in' => $expires_in,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ];
+
+        return $this->sendResponse($response, 201, 'User registered successfully with JWT.');
     }
 
     /**
@@ -60,38 +129,109 @@ class AuthController extends BaseController
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email',
             'password' => 'required|string',
+            'auth_type' => 'required|string|in:passport,sanctum,jwt',
         ]);
 
         if ($validator->fails()) {
             return $this->sendErrorResponse($validator->errors(), 422, 'Validation Error.');
         }
 
-        $credentials = request(['email', 'password']);
+        $authType = $request->input('auth_type');
 
-        //for jwt authentication
-        // if (!JWTAuth::attempt($request->only('email', 'password')))  if you want to use this auth() helper method then you have to default guard api or call auth('api')->attempt();
-        $token = auth('api')->attempt($request->only('email', 'password'));
-        if (!$token) {
+        switch ($authType) {
+            case 'passport':
+                return $this->authenticateWithPassport($request);
+            case 'sanctum':
+                return $this->authenticateWithSanctum($request);
+            case 'jwt':
+                return $this->authenticateWithJwt($request);
+            default:
+                return $this->sendErrorResponse('Invalid authentication type.', 400);
+        }
+    }
+
+    /**
+     * Authenticate user with Passport.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function authenticateWithPassport(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (!Auth::attempt($credentials)) {
             return $this->sendErrorResponse('Invalid login details', 401);
         }
-        $expires_in = auth('api')->factory()->getTTL() * 60; //only for JWT authentication
-        //for sanctum or passport
-        // if (!Auth::attempt($request->only('email', 'password'))) {
-        //     return $this->sendErrorResponse('Invalid login details', 401);
-        // }
+
         $user = User::where('email', $request->email)->firstOrFail();
-        // $token = $user->createToken('auth_token')->plainTextToken; //use it for sanctum token
-        // $access_token_result = $user->createToken('auth_token'); //use it for passport token (personal client access token)
-        // $token = $access_token_result->accessToken; //use it for passport token
-        // $expires_in = Carbon::now()->addSeconds($access_token_result->expires_in); //use it for passport token
+        $tokenResult = $user->createToken('auth_token');
+        $token = $tokenResult->accessToken;
+        $expires_in = Carbon::now()->addSeconds($tokenResult->token->expires_at->diffInSeconds(Carbon::now()));
+
         $response = [
             'access_token' => $token,
-            'expires_in' => $expires_in, //only when using passport authentication and for JWT
+            'expires_in' => $expires_in,
             'token_type' => 'Bearer',
             'user' => $user,
         ];
 
-        return $this->sendResponse($response, 200, 'Login successful.');
+        return $this->sendResponse($response, 200, 'Login successful with Passport.');
+    }
+
+    /**
+     * Authenticate user with Sanctum.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function authenticateWithSanctum(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (!Auth::attempt($credentials)) {
+            return $this->sendErrorResponse('Invalid login details', 401);
+        }
+
+        $user = User::where('email', $request->email)->firstOrFail();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $response = [
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ];
+
+        return $this->sendResponse($response, 200, 'Login successful with Sanctum.');
+    }
+
+    /**
+     * Authenticate user with JWT.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function authenticateWithJwt(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        $token = auth('api')->attempt($credentials);
+
+        if (!$token) {
+            return $this->sendErrorResponse('Invalid login details', 401);
+        }
+
+        $expires_in = auth('api')->factory()->getTTL() * 60;
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        $response = [
+            'access_token' => $token,
+            'expires_in' => $expires_in,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ];
+
+        return $this->sendResponse($response, 200, 'Login successful with JWT.');
     }
 
     // public function logout()
