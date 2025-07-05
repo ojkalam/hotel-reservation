@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-// Protected routes
+// Protected routes using sanctum auth
 Route::group(['middleware' => ['force.JSON', 'auth:sanctum']], function () {
     // Hotel routes
     Route::get('hotels', [HotelController::class, 'list'])->name('hotel.list');
@@ -27,19 +27,6 @@ Route::group(['middleware' => ['force.JSON', 'auth:sanctum']], function () {
     Route::put('amenities/{amenity}', [AmenityController::class, 'update'])->name('amenities.update');
     Route::delete('amenities/{amenity}', [AmenityController::class, 'destroy'])->name('amenities.destroy');
 
-    // Room Type routes
-    Route::get('room-types', [RoomTypeController::class, 'list'])->name('room-types.list');
-    Route::get('room-types/{roomType}', [RoomTypeController::class, 'show'])->name('room-types.show');
-    Route::post('room-types', [RoomTypeController::class, 'store'])->name('room-types.store');
-    Route::put('room-types/{roomType}', [RoomTypeController::class, 'update'])->name('room-types.update');
-    Route::delete('room-types/{roomType}', [RoomTypeController::class, 'destroy'])->name('room-types.destroy');
-
-    // Review routes
-    Route::get('reviews', [ReviewController::class, 'list'])->name('reviews.list');
-    Route::get('reviews/{review}', [ReviewController::class, 'show'])->name('reviews.show');
-    Route::post('reviews', [ReviewController::class, 'store'])->name('reviews.store');
-    Route::put('reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
-    Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
 
@@ -52,3 +39,17 @@ Route::group(['middleware' => ['force.JSON', 'auth.basic']], function () {
     Route::put('reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
+
+
+// Protected routes using passport auth
+Route::group(['middleware' => ['auth:api']], function () {
+    // Room Type routes
+    Route::get('room-types', [RoomTypeController::class, 'list'])->name('room-types.list');
+    Route::get('room-types/{roomType}', [RoomTypeController::class, 'show'])->name('room-types.show');
+    Route::post('room-types', [RoomTypeController::class, 'store'])->name('room-types.store');
+    Route::put('room-types/{roomType}', [RoomTypeController::class, 'update'])->name('room-types.update');
+    Route::delete('room-types/{roomType}', [RoomTypeController::class, 'destroy'])->name('room-types.destroy');
+
+});
+
+

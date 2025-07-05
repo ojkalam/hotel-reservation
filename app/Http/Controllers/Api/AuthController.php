@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\BaseController;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -71,10 +72,13 @@ class AuthController extends BaseController
 
         $user = User::where('email', $request->email)->firstOrFail();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
+        // $token = $user->createToken('auth_token')->plainTextToken; //use it for sanctum token
+        $access_token_result = $user->createToken('auth_token'); //use it for passport token (personal client access token)
+        $token = $access_token_result->accessToken; //use it for passport token
+        $expires_in = Carbon::now()->addSeconds($access_token_result->expires_in); //use it for passport token
         $response = [
             'access_token' => $token,
+            'expires_in' => $expires_in, //only when using passport authentication
             'token_type' => 'Bearer',
             'user' => $user,
         ];

@@ -15,6 +15,7 @@ class ForceJsonResponse
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // dd($request);
         // Force 'Accept' header to be application/json
         $request->headers->set('Accept', 'application/json');
         // if (!$request->expectsJson()){

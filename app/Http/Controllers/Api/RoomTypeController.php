@@ -33,7 +33,11 @@ class RoomTypeController extends BaseController
      */
     public function show(RoomType $roomType): JsonResponse
     {
-        return $this->sendResponse($roomType, 200, 'Room type retrieved successfully.');
+        try {
+            return $this->sendResponse($roomType, 200, 'Room type retrieved successfully.');
+        } catch (\Exception $e) {
+            return $this->sendErrorResponse($e->getMessage(), 500, 'An error occurred while retrieving room type.');
+        }
     }
 
     /**
