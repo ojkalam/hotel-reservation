@@ -41,7 +41,7 @@ Route::group(['middleware' => ['force.JSON', 'auth.basic']], function () {
 });
 
 
-// Protected routes using passport auth
+// Protected routes using passport auth or JWT auth same middleware
 Route::group(['middleware' => ['auth:api']], function () {
     // Room Type routes
     Route::get('room-types', [RoomTypeController::class, 'list'])->name('room-types.list');
