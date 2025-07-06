@@ -1,67 +1,106 @@
-# Laravel Hotel Reservation API Setup Guide
+# Laravel Hotel Reservation API
 
-This is a REST API built using Laravel for Hotel Reservation Mobile App.
+This is a robust REST API built with **Laravel** for a Hotel Reservation Mobile App, designed to provide a comprehensive backend solution for managing hotel bookings, rooms, amenities, and user interactions. It leverages **MySQL** (or PostgreSQL) as its primary database.
+
+## Key Features & Technologies
+
+This project utilizes the following key technologies and packages:
+
+-   **Laravel Framework**: The foundation for the API, providing a robust and scalable architecture.
+-   **Laravel Sanctum**: For API token authentication, ensuring secure access to your endpoints.
+-   **Tymon/JWT-Auth**: Implements JSON Web Token authentication for flexible and stateless API security.
+-   **Laravel Telescope**: A powerful assistant for debugging and monitoring your Laravel application.
+-   **Laravel Debugbar**: Integrates a developer toolbar to display debug information on any page.
+-   **Laravel IDE Helper**: Enhances IDE autocompletion for Laravel facades and models, improving development experience.
+-   **Pest PHP**: A delightful PHP testing framework for writing elegant tests.
 
 ## Prerequisites
 
--   PHP 8.1+
+-   PHP 8.2+ (as required by `composer.json`)
 -   Composer
--   MySQL/PostgreSQL
+-   MySQL or PostgreSQL database
 
 ## Installation & Setup
 
-### 1. Database Migration
+1.  **Clone the repository:**
 
-Run the database migrations to create all necessary tables:
+    ```bash
+    git clone <your-repository-url>
+    cd hotel-reservation-api
+    ```
 
-```bash
-php artisan migrate
-```
+2.  **Install Composer dependencies:**
 
-### 2. Seed Database
+    ```bash
+    composer install
+    ```
 
-Populate the database with sample data:
+3.  **Create a `.env` file:**
 
-```bash
-php artisan db:seed
-```
+    Copy the `.env.example` file and configure your database connection and other environment variables.
 
-### 3. Generate IDE Helper for Facades
+    ```bash
+    cp .env.example .env
+    ```
 
-Generate autocompletion for Laravel Facades. This creates `_ide_helper.php` file:
+4.  **Generate Application Key:**
 
-```bash
-php artisan ide-helper:generate
-```
+    ```bash
+    php artisan key:generate
+    ```
 
-### 4. Generate Model PHPDocs
+5.  **Configure Database:**
 
-Add PHPDocs to your models for better IDE support. The `-RW` flags will Reset existing PHPDocs and Write directly to the models:
+    Update your `.env` file with your database credentials:
 
-```bash
-php artisan ide-helper:models -RW
-```
+    ```
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=your_database_name
+    DB_USERNAME=your_database_user
+    DB_PASSWORD=your_database_password
+    ```
 
-## What These Commands Do
+6.  **Run Database Migrations:**
 
--   **migrate**: Creates database tables based on migration files
--   **db:seed**: Populates tables with sample/default data
--   **ide-helper:generate**: Creates IDE helper file for Laravel facades autocompletion
--   **ide-helper:models -RW**: Adds PHPDoc comments to Eloquent models for better IDE support
+    This will create all necessary tables in your database.
 
-## Next Steps
+    ```bash
+    php artisan migrate
+    ```
 
-After running these commands, your Laravel Hotel Reservation API will be ready with:
+7.  **Seed Database (Optional):**
 
--   ✅ Database schema created
--   ✅ Sample data loaded
--   ✅ IDE autocompletion configured
--   ✅ Model documentation generated
+    Populate the database with sample data for development and testing.
 
-You can now start the development server:
+    ```bash
+    php artisan db:seed
+    ```
+
+8.  **Generate IDE Helper Files (Recommended for Development):**
+
+    For enhanced IDE autocompletion and code navigation:
+
+    ```bash
+    php artisan ide-helper:generate
+    php artisan ide-helper:models -RW
+    ```
+
+## Running the Application
+
+Start the Laravel development server:
 
 ```bash
 php artisan serve
 ```
 
-The API will be available at `http://localhost:8000`
+The API will typically be available at `http://localhost:8000`.
+
+## Testing
+
+Run the tests using Pest PHP:
+
+```bash
+php artisan test
+```
